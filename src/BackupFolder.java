@@ -1,2 +1,3 @@
-package PACKAGE_NAME;public class BackupFolder {
+public class BackupFolder {
+
 }
