@@ -10,7 +10,7 @@ public class BackupNodeManager {
 
         updateNodes();
     }
-
+    
     // current available nodes
     public LinkedList<BackupNode> getCurrentAvailableNodes(){
         updateNodes();
