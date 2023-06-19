@@ -1,5 +1,6 @@
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.util.Arrays;
 
 public class BackupFile {
     private int id;
@@ -15,42 +16,33 @@ public class BackupFile {
         this.fragmentsBabkupNode = new BackupNode[fragmentsNumber];
     }
 
-    public String[] backup() throws Exception {
-        String fragmentedFile[] = new String[this.fragmentsSize.length];
-        String fileString = readFile(this.clientPath);
-
-        fragmentedFile = fragmentFileEqualy(fileString);
+    public byte[][] backup() throws Exception {
+        byte fragmentedFile[][] = fragmentFileEqualy(readFile(this.clientPath));
 
         return fragmentedFile;
     }
 
-    private String[] fragmentFileEqualy(String stringFile) {
-        int chunkLength = stringFile.length() / fragmentsSize.length;
-        String splittedFile[] = new String[this.fragmentsSize.length];
+    private byte[][] fragmentFileEqualy(byte[] byteFile) {
+        int chunkLength = byteFile.length / fragmentsSize.length;
+        byte splittedFile[][] = new byte[this.fragmentsSize.length][chunkLength];
         for(int a = 0; a < this.fragmentsSize.length; a++){
             this.fragmentsSize[a] = chunkLength;
         }
 
         int fileIndex = 0;
         for(int a = 0; a < this.fragmentsSize.length; a ++){
-            splittedFile[a] = stringFile.substring(fileIndex, fileIndex + chunkLength-1);
+            splittedFile[a] = Arrays.copyOfRange(byteFile, fileIndex, fileIndex + chunkLength-1);
             fileIndex += chunkLength;
         }
 
         return splittedFile;
     }
-    private String readFile(String filePath) throws Exception {
+    private byte[] readFile(String filePath) throws Exception {
         InputStream sourceFile = new FileInputStream(filePath);
         byte byteFile[] = new byte[sourceFile.available()];
-        char charFile[] = new char[sourceFile.available()];
-        String stringFile;
 
         sourceFile.read(byteFile);
-        for(int a = 0; a < byteFile.length; a++){
-            charFile[a] = (char)byteFile[a];
-        }
 
-        stringFile = new String(charFile);
-        return stringFile;
+        return byteFile;
     }
 }
