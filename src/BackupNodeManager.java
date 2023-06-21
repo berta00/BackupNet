@@ -1,7 +1,7 @@
 import java.util.LinkedList;
 
 public class BackupNodeManager {
-    private LinkedList<BackupNode> currentAvailableNodes; // nodes that are currently available
+    private LinkedList<BackupNode> currentAvailableNodes; // nodes that are currently available (at the last update)
     private LinkedList<BackupNode> storageNodes; // nodes that has storage in them (even the inactive ones)
 
     public BackupNodeManager(){
