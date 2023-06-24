@@ -2,6 +2,7 @@ public class BackupNode {
     private int id;
     private int[] ip;
     private String hostname;
+    private byte[] macAddress;
     private int storageCapacity;
     private int[] backupId;
 

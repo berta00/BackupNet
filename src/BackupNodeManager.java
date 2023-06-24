@@ -47,4 +47,14 @@ public class BackupNodeManager {
 
         return availableStorageNodesWithBackup;
     }
+
+    // search for backup fragment from storage node
+    public byte[] getFragmentFromStorageNode(int backupId, int fragmentId){
+        updateNodes();
+        byte[] retrivedFragment = null;
+
+        //todo: request to all available nodes if fragment is available
+
+        return retrivedFragment;
+    }
 }

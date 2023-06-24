@@ -9,7 +9,7 @@ public class BackupFile {
     private int[] fragmentsSize;
     private BackupNode[] fragmentsBabkupNode;
 
-    public BackupFile(int id, String clientPath, int fragmentsNumber){
+    public BackupFile(int id, int fragmentsNumber, String clientPath){
         this.id = id;
         this.clientPath = clientPath;
         this.fragmentsSize = new int[fragmentsNumber];
