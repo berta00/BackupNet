@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileNotFoundException;
 
 public class Main {
@@ -17,6 +18,8 @@ public class Main {
                 }
                 System.out.println("Frammento " + a + ": " + curStr);
             }
+
+
 
         } catch(Exception e) {
             System.out.println("file not found: " + e.getMessage());
