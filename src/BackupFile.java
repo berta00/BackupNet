@@ -6,16 +6,49 @@ public class BackupFile {
     private int id;
     private int size;
     private String clientPath;
-    private int[] fragmentsSize;
-    private BackupNode[] fragmentsBabkupNode;
+    private int[] fragmentsSize; // parallel array 1
+    private BackupNode[] fragmentsBabkupNodes; // parallel array 2
 
     public BackupFile(int id, int fragmentsNumber, String clientPath){
         this.id = id;
         this.clientPath = clientPath;
         this.fragmentsSize = new int[fragmentsNumber];
-        this.fragmentsBabkupNode = new BackupNode[fragmentsNumber];
+        this.fragmentsBabkupNodes = new BackupNode[fragmentsNumber];
     }
 
+    public int getId(){
+        return this.id;
+    }
+    public int getSize(){return this.size;}
+    public String getClientPath(){
+        return this.clientPath;
+    }
+    public void setClientPath(String clientPath){
+        this.clientPath = clientPath;
+    }
+    public int[] getFragmentsSize(){
+        return this.fragmentsSize.clone();
+    }
+    public void setFragmentsSize(int[] fragmentsSize){ // attention: parameter must have the same length of the attribute
+        for(int a = 0; a < fragmentsSize.length; a++){
+            this.fragmentsSize[a] = fragmentsSize[a];
+        }
+    }
+    public BackupNode[] getFragmentsBabkupNodes(){
+        BackupNode[] copy = new BackupNode[this.fragmentsBabkupNodes.length];
+        for(int a = 0; a < copy.length; a++){
+            copy[a] = this.fragmentsBabkupNodes[a].clone();
+        }
+        return copy;
+    }
+    public BackupNode getFragmentsBackupNode(int index){
+        return this.fragmentsBabkupNodes[index].clone();
+    }
+    public void setFragmentsBabkupNodes(int index, BackupNode node){
+        this.fragmentsBabkupNodes[index] = node.clone();
+    }
+
+    // backup and backup utilities
     public byte[][] backup() throws Exception {
         byte fragmentedFile[][] = fragmentFileEqualy(readFile(this.clientPath));
 
