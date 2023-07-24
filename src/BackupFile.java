@@ -7,19 +7,21 @@ public class BackupFile {
     private int size;
     private String clientPath;
     private int[] fragmentsSize; // parallel array 1
-    private BackupNode[] fragmentsBabkupNodes; // parallel array 2
+    private BackupNode[] fragmentsBakupNodes; // parallel array 2
 
     public BackupFile(int id, int fragmentsNumber, String clientPath){
         this.id = id;
         this.clientPath = clientPath;
         this.fragmentsSize = new int[fragmentsNumber];
-        this.fragmentsBabkupNodes = new BackupNode[fragmentsNumber];
+        this.fragmentsBakupNodes = new BackupNode[fragmentsNumber];
     }
 
     public int getId(){
         return this.id;
     }
-    public int getSize(){return this.size;}
+    public int getSize(){
+        return this.size;
+    }
     public String getClientPath(){
         return this.clientPath;
     }
@@ -34,18 +36,31 @@ public class BackupFile {
             this.fragmentsSize[a] = fragmentsSize[a];
         }
     }
-    public BackupNode[] getFragmentsBabkupNodes(){
-        BackupNode[] copy = new BackupNode[this.fragmentsBabkupNodes.length];
+    public BackupNode[] getFragmentBabkupNodes(){
+        BackupNode[] copy = new BackupNode[this.fragmentsBakupNodes.length];
         for(int a = 0; a < copy.length; a++){
-            copy[a] = this.fragmentsBabkupNodes[a].clone();
+            copy[a] = this.fragmentsBakupNodes[a].clone();
         }
         return copy;
     }
-    public BackupNode getFragmentsBackupNode(int index){
-        return this.fragmentsBabkupNodes[index].clone();
+    public BackupNode getFragmentBackupNodeByIndex(int index){
+        return this.fragmentsBakupNodes[index].clone();
     }
-    public void setFragmentsBabkupNodes(int index, BackupNode node){
-        this.fragmentsBabkupNodes[index] = node.clone();
+    public void setFragmentsBabkupNodesByIndex(int index, BackupNode node){
+        this.fragmentsBakupNodes[index] = node.clone();
+    }
+    public BackupNode getFragmentBackupNodeById(int id){
+        int a = 0;
+        boolean exit = false;
+        while(!exit){
+            if(a >= this.fragmentsBakupNodes.length){
+                exit = true;
+            } else if(this.fragmentsBakupNodes[a].getId() == id){
+                return this.fragmentsBakupNodes[a];
+            }
+            a++;
+        }
+        return null;
     }
 
     // backup and backup utilities
@@ -70,6 +85,7 @@ public class BackupFile {
 
         return splittedFile;
     }
+
     private byte[] readFile(String filePath) throws Exception {
         InputStream sourceFile = new FileInputStream(filePath);
         byte byteFile[] = new byte[sourceFile.available()];

@@ -6,8 +6,8 @@ public class BackupNode {
     private String hostname;
     private byte[] macAddress;
     private int storageCapacity;
-    private int[] backupId; //parallel array
-    private int[] backupFragment; //parallel array
+    private int[] backupId; // parallel array
+    private int[] backupFragment; // parallel array
 
     public BackupNode(int id, int[] ip){
         this.id = id;
@@ -33,8 +33,23 @@ public class BackupNode {
     public int getStoredBackupIdByIndex(int index){
         return this.backupId[index];
     }
-    public int getStiredFragmentNumberByBackupId(int backupId){return this.backupFragment[backupId];}
+    public int getStoredFragmentNumberByBackupId(int backupId){
+        return this.backupFragment[backupId];
+    }
+    public byte[] getStoredFragmentByBackupIdAndFragmentId(int backupId, int fragmentId){
+        int a = 0;
+        boolean exit = false;
+        while(!exit){
+            if(this.backupId[a] == backupId && this.backupFragment[a] == fragmentId){
+                return getFragmentFromHost(a);
+            }
+        }
+        return null;
+    }
 
+    private byte[] getFragmentFromHost(int fragmentIndex){
+        return null;
+    }
 
     public BackupNode clone(){
         BackupNode copy = new BackupNode(this.id, this.ip.clone());

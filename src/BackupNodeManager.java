@@ -1,46 +1,55 @@
 import javax.imageio.ImageTranscoder;
+import java.io.*;
+import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.LinkedList;
 
 public class BackupNodeManager {
-    private LinkedList<BackupNode> currentAvailableNodes; // nodes that are currently available (at the last update)
-    private LinkedList<BackupNode> currentAvailableStorageNodes; // nodes that are currently available (at the last update)
-    private LinkedList<BackupNode> storageNodes; // nodes that has storage in them (even the inactive ones)
-    private LinkedList<BackupFile> backups; // all the backups made
+    private static LinkedList<BackupNode> currentAvailableNodes = new LinkedList<BackupNode>(); // nodes that are currently available (at the last update)
+    private static LinkedList<BackupNode> currentAvailableStorageNodes = new LinkedList<BackupNode>(); // nodes that are currently available (at the last update)
+    private static LinkedList<BackupNode> storageNodes = new LinkedList<BackupNode>(); // nodes that has storage in them (even the inactive ones)
+    private static LinkedList<BackupFile> backups = new LinkedList<BackupFile>(); // all the backups made
 
-    public BackupNodeManager(){
-        this.currentAvailableNodes = new LinkedList<BackupNode>();
-        this.currentAvailableStorageNodes = new LinkedList<BackupNode>();
-        this.storageNodes = new LinkedList<BackupNode>();
-        this.backups = new LinkedList<BackupFile>();
+    // discovery
+    public static String discoveryRequest(String address) throws IOException {
+        Socket socket = new Socket(address, 4040);
 
-        updateNodes();
+        InputStreamReader inputReader = new InputStreamReader(socket.getInputStream());
+        BufferedReader bufferedReader = new BufferedReader(inputReader);
+
+        PrintWriter outputWriter = new PrintWriter(socket.getOutputStream());
+
+        // write discovery request in the socket
+        outputWriter.println("discovery request");
+        // wait for response
+        return bufferedReader.readLine();
     }
-    
+
     // current available nodes
-    public LinkedList<BackupNode> getCurrentAvailableNodes(){
+    public static LinkedList<BackupNode> getCurrentAvailableNodes(){
         updateNodes();
-        return this.currentAvailableNodes;
+        return currentAvailableNodes;
     }
-    public int getCurrentAvailableNodesNumber(){
+    public static int getCurrentAvailableNodesNumber(){
         updateNodes();
-        return this.currentAvailableNodes.size();
+        return currentAvailableNodes.size();
     }
-    private void updateNodes(){
+    private static void updateNodes(){
         //todo: update the all available nodes in the network
     }
 
     // storage nodes
-    public LinkedList<BackupNode> getStorageNodes(){
-        return this.currentAvailableNodes;
+    public static LinkedList<BackupNode> getStorageNodes(){
+        return currentAvailableNodes;
     }
-    public int getStorageNodesNumber(){
-        return this.storageNodes.size();
+    public static int getStorageNodesNumber(){
+        return storageNodes.size();
     }
 
     // available storage nodes and storage match search
-    public LinkedList<BackupNode> getAvailableStorageNodes(){
+    public static LinkedList<BackupNode> getAvailableStorageNodes(){
         updateNodes();
-        return this.currentAvailableStorageNodes;
+        return currentAvailableStorageNodes;
     }
     /*
     public LinkedList<BackupNode> getAvailableStorageNodesByBackupId(int id){
@@ -59,33 +68,38 @@ public class BackupNodeManager {
     */
 
     // search for backup
-    public byte[] getBackupById(int backupId){
+    public static byte[] getBackupById(int backupId){
         BackupFile matchingBackup = null;
 
         int a = 0;
         boolean exit = false;
         while(!exit){
-            if(this.backups.get(a).getId() == backupId){
+            if(backups.get(a).getId() == backupId){
                 exit = true;
-                matchingBackup = this.backups.get(a);
+                matchingBackup = backups.get(a);
             }
             a++;
         }
 
         byte[] retrivedBackupData = new byte[matchingBackup.getSize()];
-        for(int b = 0, c = 0; b < matchingBackup.getSize(); b++){
-            retrivedBackupData[b] = matchingBackup.
+        for(int b = 0, d = 0; b < matchingBackup.getFragmentsSize().length; b++){
+            byte[] retrivedFrame = matchingBackup.getFragmentBackupNodeById(backupId).getStoredFragmentByBackupIdAndFragmentId(backupId, b);
+            for(int c = 0; c < retrivedFrame.length; c++){
+                retrivedBackupData[d] = retrivedFrame[c];
+                d++;
+            }
         }
 
+        return retrivedBackupData;
     }
-    private byte[] getFragmentFromStorageNode(int backupId, int fragmentId){
+    private static byte[] getFragmentFromStorageNode(int backupId, int fragmentId){
         updateNodes();
         byte[] retrivedFragment = null;
 
         int a = 0;
         boolean exit = false;
         while(!exit){
-            if(this.backups.get(a).getId() == backupId){
+            if(backups.get(a).getId() == backupId){
 
             }
             a++;
