@@ -2,26 +2,31 @@ import java.util.LinkedList;
 
 public class BackupNode {
     private int id;
-    private int[] ip;
+    private String ip;
     private String hostname;
-    private byte[] macAddress;
+    private String macAddress;
     private int storageCapacity;
+
+    // need to get a ceck
     private int[] backupId; // parallel array
     private int[] backupFragment; // parallel array
 
-    public BackupNode(int id, int[] ip){
+    public BackupNode(int id, String ip, String hostname, String macAddress){
         this.id = id;
-        this.ip = ip.clone();
+        this.ip = ip;
+        this.hostname = hostname;
+        this.macAddress = macAddress;
+
+        // need to get a ceck
+        this.storageCapacity = 0;
         this.backupId = new int[100];
         this.backupFragment = new int[100];
-
-        //todo: request to the host hostname, and check if port of backup service is available
-        //todo: if backup service is available get storageCapacity and backupId
     }
 
     public int getId(){return this.id;}
-    public int[] getIp(){return this.ip.clone();}
+    public String getIp(){return this.ip;}
     public String getHostname(){return this.hostname;}
+    public String getMacAddress(){return this.macAddress;}
     public int getStorageCapacity(){return this.storageCapacity;}
     public void setStorageCapacity(int storageCapacity){this.storageCapacity = storageCapacity;}
     public int getStoredBackupsNumber(){
@@ -51,13 +56,18 @@ public class BackupNode {
         return null;
     }
 
+    public String toPrintableFormat(){
+        return "" +
+                "ip:       " + this.ip         + "\n" +
+                "mac:      " + this.macAddress + "\n" +
+                "hostname: " + this.hostname   + "\n" +
+                "";
+    }
+
     public BackupNode clone(){
-        BackupNode copy = new BackupNode(this.id, this.ip.clone());
-        copy.hostname = this.hostname;
-        copy.macAddress = this.macAddress.clone();
+        BackupNode copy = new BackupNode(this.id, this.ip, this.hostname, this.macAddress);
         copy.storageCapacity = this.storageCapacity;
         copy.backupId = this.backupId.clone();
-
         return copy;
     }
 }

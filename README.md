@@ -24,13 +24,13 @@
 ###
 
 #### Arguments
-| selector | argument  | description                                                             |
-|---------|-----------|-------------------------------------------------------------------------|
-| -d      | 1         | debug mode 1 (opens port 4040 on the host)                              |
-| -d      | 2         | debug mode 2 (ping all the host running this program on the network)    |
-| -d      | 3         | debug mode 3 (discovery mode)                                           |
-| -i      | address   | specify the target address of an operation (like discovery mode)        |
-| -f      | file/path | specify the file to backup, update, ecc (depends on the other arguments |
-| -b      | none      | backup a specifyed file on the network                                  |
-| -Fr     | none      | test file fragmentation                                                 |
-| -s      | none      | sync a specifyed file                                                   |
+| selector | argument  | description                                                            |
+|----------|-----------|------------------------------------------------------------------------|
+| -d       | 1         | debug mode 1 (opens port 4040 on the host)                             |
+| -d       | 2         | debug mode 2 (discovery mode)                                          |
+| -d       | 3         | debug mode 3 (get local computer information)                          |
+| -i       | address   | specify the target address of an operation (like discovery mode)       |
+| -f       | file/path | specify the file to backup, update, ecc (depends on the other arguments |
+| -b       | none      | backup a specifyed file on the network                                 |
+| -Fr      | none      | test file fragmentation                                                |
+| -s       | none      | sync a specifyed file                                                  |

@@ -1,5 +1,6 @@
 import java.io.*;
 import java.net.*;
+import java.util.LinkedList;
 import java.util.Properties;
 
 public class Main {
@@ -11,12 +12,11 @@ public class Main {
 
     // software data
     private static String localSoftwareVersion = "";
+    private static int localSoftwarePort = 0;
     private static String banner = "";
 
-    // local data
-    private static String localHostname = "";
-    private static String localIp = "";
-
+    // local node
+    private static BackupNode localNode;
     public static void main(String[] args) {
         // read config file
         String configFilePath = "backupWave.config";
@@ -25,8 +25,10 @@ public class Main {
             configFile.load(configFileIS);
             // assign config variables to attributes
             localSoftwareVersion = configFile.getProperty("backupWave.version");
+            localSoftwarePort = Integer.parseInt(configFile.getProperty("backupWave.port"));
             banner = configFile.getProperty("backupWave.banner");
-        } catch(IOException e ){
+
+        } catch(IOException e){
             throwError("Coudn't find the configuration file", true);
         }
 
@@ -36,12 +38,24 @@ public class Main {
         System.out.println(banner);
 
         // assign local host data
+        String localIp = "", localHostname = "", localMacAddr = "";
         try(Socket socket = new Socket()){
             socket.connect(new InetSocketAddress("google.com", 80));
+            // get local ip
             localIp = socket.getLocalAddress().getHostAddress();
+            // get local mac address
+            byte[] localByteMacAddr = NetworkInterface.getByInetAddress(socket.getLocalAddress()).getHardwareAddress();
+            StringBuilder stringBuilder = new StringBuilder();
+            for(int a = 0; a < localByteMacAddr.length; a++){
+                stringBuilder.append(String.format("%02X%s", localByteMacAddr[a], (a < localByteMacAddr.length - 1) ? "-" : ""));
+            }
+            localMacAddr = stringBuilder.toString();
+            // get local hostname
             localHostname = InetAddress.getLocalHost().getHostName();
+            // assign all infos to the local backupNode
+            localNode = new BackupNode(0, localIp, localHostname, localMacAddr);
         } catch(Exception e ){
-            throwError("Please assign an ip to the computer in order to use this software", true);
+            throwError("Please assign an ip to the computer in order to use this software " + e.getMessage(), true);
         }
 
         int debugMode = 0;
@@ -90,66 +104,35 @@ public class Main {
             case 1:
                 try {
                     System.out.println("⚠\uFE0F  Debug mode 1 enabled ⚠\uFE0F");
-                    openServiceAtPort(4040);
+                    // opens the service
+                    BackupNodeManager.openServiceAtPort(localSoftwarePort, localNode);
                 } catch(IOException e){
                     System.out.println("error: " + e.getMessage());
                 }
                 break;
             case 2:
                 System.out.println("⚠\uFE0F  Debug mode 2 enabled ⚠\uFE0F");
-                String discoveryResponse = "";
+                BackupNode discoveryResponse = null;
                 try {
-                    discoveryResponse = BackupNodeManager.discoveryRequest(targetAddress);
+                    String localData = localSoftwareVersion + ";ip=" + localIp + ";hostname=" + localHostname;
+                    // makes a discovery request
+                    discoveryResponse = BackupNodeManager.discoveryRequest(targetAddress, localSoftwarePort, localData);
                 } catch(IOException e){
                     throwError("IOException during a discovery connection", true);
                 }
                 // print the response
-                System.out.println(discoveryResponse);
+                System.out.println("ds-response:" + discoveryResponse.toPrintableFormat());
                 break;
             case 3:
                 System.out.println("⚠\uFE0F  Debug mode 3 enabled ⚠\uFE0F");
                 System.out.println("version:  " + localSoftwareVersion);
-                System.out.println("hostname: " + localHostname);
-                System.out.println("ip:       " + localIp);
+                System.out.println(localNode.toPrintableFormat());
                 System.exit(1);
                 break;
             default:
                 throwError("Invalid argument", true);
         }
 
-    }
-
-    private static void openServiceAtPort(int port) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(port);
-        System.out.println("\nListening for requests:");
-
-        // listen for connections
-        boolean forceExit = false;
-        while(!forceExit){
-            Socket socket = serverSocket.accept();
-
-            // TODO: shoud create a new thread to handle every socket
-
-            // input
-            InputStreamReader inputReader = new InputStreamReader(socket.getInputStream());
-            BufferedReader bufferedInputReader = new BufferedReader(inputReader);
-
-            // output
-            OutputStream output = socket.getOutputStream();
-            PrintWriter outputWriter = new PrintWriter(output);
-
-            // read incoming requests
-            String request = bufferedInputReader.readLine();
-
-            if(request.equals("discovery request")){
-                String response = "discovery response;" + localSoftwareVersion + ";ip=" + localIp + ";hostname=" + localHostname;
-                outputWriter.println(response);
-            } else if(request.equals("remote-software-shutdown request")){
-                String response = "remote-software-shutdown response";
-                outputWriter.println(response);
-                forceExit = true;
-            }
-        }
     }
 
     // error handling

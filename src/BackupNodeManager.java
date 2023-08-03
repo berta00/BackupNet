@@ -1,82 +1,95 @@
 import javax.imageio.ImageTranscoder;
 import java.io.*;
+import java.lang.reflect.Type;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
 
+import com.google.gson.*;
+
 public class BackupNodeManager {
-    private static LinkedList<BackupNode> currentAvailableNodes = new LinkedList<BackupNode>(); // nodes that are currently available (at the last update)
-    private static LinkedList<BackupNode> currentAvailableStorageNodes = new LinkedList<BackupNode>(); // nodes that are currently available (at the last update)
-    private static LinkedList<BackupNode> storageNodes = new LinkedList<BackupNode>(); // nodes that has storage in them (even the inactive ones)
-    private static LinkedList<BackupFile> backups = new LinkedList<BackupFile>(); // all the backups made
+    private static LinkedList<BackupNode> backupNodes = new LinkedList<>();
+    private static LinkedList<BackupNode> availableNodes = new LinkedList<>();
+    private static LinkedList<BackupFile> backupFiles = new LinkedList<>();
+
+    // main request response
+
+    public static void openServiceAtPort(int port, BackupNode localNode) throws IOException {
+        ServerSocket serverSocket = new ServerSocket(port);
+        System.out.println("\nListening for requests:");
+        // listen for connections
+        boolean forceExit = false;
+        while(!forceExit){
+            Socket socket = serverSocket.accept();
+
+            // TODO: shoud create a new thread to handle every socket
+
+            // input
+            InputStreamReader inputReader = new InputStreamReader(socket.getInputStream());
+            BufferedReader bufferedInputReader = new BufferedReader(inputReader);
+
+            // output
+            OutputStream output = socket.getOutputStream();
+            PrintWriter outputWriter = new PrintWriter(output, true);
+
+            // read incoming requests
+            String requestLine = bufferedInputReader.readLine();
+
+            if(requestLine.substring(0,6).equals("ds-req")){  // ceck for discovery request
+                Gson jsonMarshal = new Gson();
+                String response = "ds-res;" + jsonMarshal.toJson(localNode);
+                outputWriter.println(response);
+            } else if(requestLine.substring(0,6).equals("sd-req")){  // ceck for remote shutdown request
+                String response = "sd-res;";
+                outputWriter.println(response);
+                forceExit = true;
+            }
+        }
+    }
 
     // discovery
-    public static String discoveryRequest(String address) throws IOException {
-        Socket socket = new Socket(address, 4040);
+    public static BackupNode discoveryRequest(String address, int port, String localInfos) throws IOException { // localInfos: softwareVersion;ip;hostname
+        Socket socket = new Socket(address, port);
 
         InputStreamReader inputReader = new InputStreamReader(socket.getInputStream());
         BufferedReader bufferedReader = new BufferedReader(inputReader);
 
-        PrintWriter outputWriter = new PrintWriter(socket.getOutputStream());
+        PrintWriter outputWriter = new PrintWriter(socket.getOutputStream(), true);
 
         // write discovery request in the socket
-        outputWriter.println("discovery request");
+        outputWriter.println("ds-req;" + localInfos);
+        // parse the response
+        // create a new backup node
+        Gson jsonUnmarshal = new Gson();
+        BackupNode discoveredNode = jsonUnmarshal.fromJson(bufferedReader.readLine().substring(7), BackupNode.class);
         // wait for response
-        return bufferedReader.readLine();
+        return discoveredNode;
     }
 
     // current available nodes
-    public static LinkedList<BackupNode> getCurrentAvailableNodes(){
+    public static LinkedList<BackupNode> getAvailableNodes(){
         updateNodes();
-        return currentAvailableNodes;
+        return availableNodes;
     }
-    public static int getCurrentAvailableNodesNumber(){
+    public static int getAvailableNodesSize(){
         updateNodes();
-        return currentAvailableNodes.size();
+        return availableNodes.size();
     }
     private static void updateNodes(){
         //todo: update the all available nodes in the network
     }
 
-    // storage nodes
-    public static LinkedList<BackupNode> getStorageNodes(){
-        return currentAvailableNodes;
-    }
-    public static int getStorageNodesNumber(){
-        return storageNodes.size();
-    }
-
-    // available storage nodes and storage match search
-    public static LinkedList<BackupNode> getAvailableStorageNodes(){
-        updateNodes();
-        return currentAvailableStorageNodes;
-    }
-    /*
-    public LinkedList<BackupNode> getAvailableStorageNodesByBackupId(int id){
-        LinkedList<BackupNode> availableStorageNodesWithBackup = new LinkedList<BackupNode>();
-
-        for(int a = 0; a < this.currentAvailableStorageNodes.size(); a++){
-            for(int b = 0; b < this.currentAvailableStorageNodes.get(a).getStoredBackupsNumber(); b++){
-                if(this.currentAvailableStorageNodes.get(a).getStoredBackupIdByIndex(b) == id){
-                    availableStorageNodesWithBackup.add(this.currentAvailableStorageNodes.get(a));
-                }
-            }
-        }
-
-        return availableStorageNodesWithBackup;
-    }
-    */
-
     // search for backup
-    public static byte[] getBackupById(int backupId){
+    public static byte[] getBackupFileById(int backupId){
         BackupFile matchingBackup = null;
 
         int a = 0;
         boolean exit = false;
         while(!exit){
-            if(backups.get(a).getId() == backupId){
+            if(backupFiles.get(a).getId() == backupId){
                 exit = true;
-                matchingBackup = backups.get(a);
+                matchingBackup = backupFiles.get(a);
             }
             a++;
         }
@@ -92,14 +105,14 @@ public class BackupNodeManager {
 
         return retrivedBackupData;
     }
-    private static byte[] getFragmentFromStorageNode(int backupId, int fragmentId){
+    private static byte[] getFragmentFromNode(int backupId, int fragmentId){
         updateNodes();
         byte[] retrivedFragment = null;
 
         int a = 0;
         boolean exit = false;
         while(!exit){
-            if(backups.get(a).getId() == backupId){
+            if(backupFiles.get(a).getId() == backupId){
 
             }
             a++;
