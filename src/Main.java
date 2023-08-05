@@ -13,6 +13,7 @@ public class Main {
     // software data
     private static String localSoftwareVersion = "";
     private static int localSoftwarePort = 0;
+    private static int backlog = 0;
     private static String banner = "";
 
     // local node
@@ -26,9 +27,10 @@ public class Main {
             // assign config variables to attributes
             localSoftwareVersion = configFile.getProperty("backupWave.version");
             localSoftwarePort = Integer.parseInt(configFile.getProperty("backupWave.port"));
+            backlog = Integer.parseInt(configFile.getProperty("backupWave.backlog"));
             banner = configFile.getProperty("backupWave.banner");
 
-        } catch(IOException e){
+         } catch(IOException e){
             throwError("Coudn't find the configuration file", true);
         }
 
@@ -40,9 +42,8 @@ public class Main {
         // assign local host data
         String localIp = "", localHostname = "", localMacAddr = "";
         try(Socket socket = new Socket()){
+            //TODO: change ip source (an host might be not connected to the internet)
             socket.connect(new InetSocketAddress("google.com", 80));
-            // get local ip
-            localIp = socket.getLocalAddress().getHostAddress();
             // get local mac address
             byte[] localByteMacAddr = NetworkInterface.getByInetAddress(socket.getLocalAddress()).getHardwareAddress();
             StringBuilder stringBuilder = new StringBuilder();
@@ -53,7 +54,7 @@ public class Main {
             // get local hostname
             localHostname = InetAddress.getLocalHost().getHostName();
             // assign all infos to the local backupNode
-            localNode = new BackupNode(0, localIp, localHostname, localMacAddr);
+            localNode = new BackupNode(0, localSoftwareVersion, socket.getLocalAddress(), localSoftwarePort, localHostname, localMacAddr);
         } catch(Exception e ){
             throwError("Please assign an ip to the computer in order to use this software " + e.getMessage(), true);
         }
@@ -105,27 +106,27 @@ public class Main {
                 try {
                     System.out.println("⚠\uFE0F  Debug mode 1 enabled ⚠\uFE0F");
                     // opens the service
-                    BackupNodeManager.openServiceAtPort(localSoftwarePort, localNode);
-                } catch(IOException e){
-                    System.out.println("error: " + e.getMessage());
+                    BackupNodeManager.openServiceAtPort(localSoftwarePort, backlog, localNode);
+                } catch(Exception e){
+                    throwError(e.getMessage(), true);
                 }
                 break;
             case 2:
                 System.out.println("⚠\uFE0F  Debug mode 2 enabled ⚠\uFE0F");
                 BackupNode discoveryResponse = null;
                 try {
-                    String localData = localSoftwareVersion + ";ip=" + localIp + ";hostname=" + localHostname;
+                    // use json notation to send localhost infos
+                    String localData = "";
                     // makes a discovery request
                     discoveryResponse = BackupNodeManager.discoveryRequest(targetAddress, localSoftwarePort, localData);
                 } catch(IOException e){
-                    throwError("IOException during a discovery connection", true);
+                    throwError(e.getMessage(), true);
                 }
                 // print the response
-                System.out.println("ds-response:" + discoveryResponse.toPrintableFormat());
+                System.out.println("ds-response;\n" + discoveryResponse.toPrintableFormat());
                 break;
             case 3:
                 System.out.println("⚠\uFE0F  Debug mode 3 enabled ⚠\uFE0F");
-                System.out.println("version:  " + localSoftwareVersion);
                 System.out.println(localNode.toPrintableFormat());
                 System.exit(1);
                 break;

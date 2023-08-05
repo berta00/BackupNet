@@ -1,8 +1,13 @@
+import java.io.IOException;
+import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.util.LinkedList;
 
 public class BackupNode {
     private int id;
-    private String ip;
+    private String version;
+    private InetAddress address;
+    private int port;
     private String hostname;
     private String macAddress;
     private int storageCapacity;
@@ -11,9 +16,11 @@ public class BackupNode {
     private int[] backupId; // parallel array
     private int[] backupFragment; // parallel array
 
-    public BackupNode(int id, String ip, String hostname, String macAddress){
+    public BackupNode(int id, String version, InetAddress address, int port, String hostname, String macAddress){
         this.id = id;
-        this.ip = ip;
+        this.version = version;
+        this.address = address;
+        this.port = port;
         this.hostname = hostname;
         this.macAddress = macAddress;
 
@@ -24,7 +31,7 @@ public class BackupNode {
     }
 
     public int getId(){return this.id;}
-    public String getIp(){return this.ip;}
+    public InetAddress getAddress(){return this.address;}
     public String getHostname(){return this.hostname;}
     public String getMacAddress(){return this.macAddress;}
     public int getStorageCapacity(){return this.storageCapacity;}
@@ -57,15 +64,22 @@ public class BackupNode {
     }
 
     public String toPrintableFormat(){
+        String portStatus = "available";
+        try(ServerSocket testSocket = new ServerSocket(this.port);){} catch (IOException e){
+            portStatus = "already in use";
+        }
+
         return "" +
-                "ip:       " + this.ip         + "\n" +
-                "mac:      " + this.macAddress + "\n" +
-                "hostname: " + this.hostname   + "\n" +
+                "version:  " + this.version                         + "\n" +
+                "ip:       " + this.address.getHostAddress()        + "\n" +
+                "port:     " + this.port       + " - " + portStatus + "\n" +
+                "mac:      " + this.macAddress                      + "\n" +
+                "hostname: " + this.hostname                        + "\n" +
                 "";
     }
 
     public BackupNode clone(){
-        BackupNode copy = new BackupNode(this.id, this.ip, this.hostname, this.macAddress);
+        BackupNode copy = new BackupNode(this.id, this.version, this.address, this.port, this.hostname, this.macAddress);
         copy.storageCapacity = this.storageCapacity;
         copy.backupId = this.backupId.clone();
         return copy;

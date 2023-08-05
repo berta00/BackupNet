@@ -1,6 +1,7 @@
 import javax.imageio.ImageTranscoder;
 import java.io.*;
 import java.lang.reflect.Type;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -15,8 +16,11 @@ public class BackupNodeManager {
 
     // main request response
 
-    public static void openServiceAtPort(int port, BackupNode localNode) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(port);
+    public static void openServiceAtPort(int port, int backlog, BackupNode localNode) throws Exception {
+        ServerSocket serverSocket = new ServerSocket(port, backlog);
+        System.out.println("Server running on:");
+        System.out.println("address: " + serverSocket.getLocalSocketAddress());
+        System.out.println("port:    " + serverSocket.getLocalPort());
         System.out.println("\nListening for requests:");
         // listen for connections
         boolean forceExit = false;
