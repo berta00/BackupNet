@@ -24,13 +24,15 @@
 ###
 
 #### Arguments
-| selector | argument  | description                                                            |
-|----------|-----------|------------------------------------------------------------------------|
-| -d       | 1         | debug mode 1 (opens port 4040 on the host)                             |
-| -d       | 2         | debug mode 2 (discovery mode)                                          |
-| -d       | 3         | debug mode 3 (get local computer information)                          |
-| -i       | address   | specify the target address of an operation (like discovery mode)       |
-| -f       | file/path | specify the file to backup, update, ecc (depends on the other arguments |
-| -b       | none      | backup a specifyed file on the network                                 |
-| -Fr      | none      | test file fragmentation                                                |
-| -s       | none      | sync a specifyed file                                                  |
+| short arg | long arg | option    | description                                        |
+|:----------|:---------|:----------|:---------------------------------------------------|
+| -d        | --debug  | 1         | debug mode 1 (opens port 4040 on the host)         |
+| -d        | --debug  | 2         | debug mode 2 [ -t ] (manual discovery mode)        |
+| -d        | --debug  | 3         | debug mode 3 (get local computer information)      |
+| -d        | --debug  | 4         | debug mode 4 (file fragmentation)                  |
+| -t        | --target | address   | specify the target address of an operation         |
+| -p        | --path   | file/path | specify a file or directory path of an operation   |
+| -r        | --remove | file/path | remove a file or directory from stage              |
+| -a        | --add    | file/path | add a new file or directory to stage               |
+| -b        | --backup | none      | backup all the files staged                        |
+| -b        | --backup | file/path | backup a file or a directory                       |
