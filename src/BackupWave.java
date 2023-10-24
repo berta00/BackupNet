@@ -1,32 +1,62 @@
+import configuration.Configuration;
 import org.apache.commons.cli.*;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 public class BackupWave {
-    private int inPort = 4040;
-    private int outPort = 4041;
+    // RELEASE INFORMATION
+    private static final String softwareVersion = "1.0";
+
+    // CONFIGURATION ATTRIBUTES
+    private static int inPort = 4040;
+    private static int outPort = 4041;
+    private static String banner = null;
+    private static String networkInterface = null;
+
+    // ARGUMENT ATTRIBUTES
+    private String targetAddress = null;
+    private String filePath = null;
 
     public static void main(String[] args){
+        // configuration parser
+        String relativeFilePath = System.getProperty("user.dir") + "/config/backupWave.properties";
+        System.out.println(relativeFilePath);
+
+        try {
+            inPort = Configuration.parseConfigFile(relativeFilePath).getInPort();
+            outPort = Configuration.parseConfigFile(relativeFilePath).getOutPort();
+            banner = Configuration.parseConfigFile(relativeFilePath).getBanner();
+            networkInterface = Configuration.parseConfigFile(relativeFilePath).getNetworkInterface();
+        } catch (FileNotFoundException e1){
+            System.out.println("Error: " + e1.getMessage());
+            System.exit(-1);
+        } catch (IOException e2){
+            System.out.println("Error: " + e2.getMessage());
+            System.exit(-1);
+        }
+
         // banner
+        System.out.println(banner);
 
         // arguments handling
-        int argumentReturn;
+        int argumentReturn = 0;
+
         try {
             argumentReturn = argumentHandler(args);
         } catch (Exception e){
             System.out.println("Error: " + e.getMessage());
             System.exit(-1);
         }
-
-        // TODO: ceck project structure here
-
     }
 
-    // ARGUMENT HANDLER
+    // ARGUMENTS HANDLER
     /**
      * Parses the given arguments with the rules given in {@link #optionInit()} and then calls the
      * method needed in order to satisfy the arguments. It will return a global status code
      *
      * @param args the arguments to be parsed
-     * @return a status call:
+     * @return
      *      0 - the method has everything done;
      *      1 - the method has started a background task
      * @throws Exception if there are any problem during the parsing
@@ -39,30 +69,7 @@ public class BackupWave {
 
         // debug modes
         if(cmd.hasOption("d")){
-            switch (cmd.getOptionValue("d")){
-                case "1":
-                    returnStatus = Debug.openPort(4040);
-                    break;
-                case "2":
-                    if(cmd.hasOption("t")){
-                        returnStatus = Debug.discoveryRequest(cmd.getOptionValue("t"));
-                    } else {
-                        throw new IllegalArgumentException("Invalid debug argument (discover mode needs a target ip [-t])");
-                    }
-                    break;
-                case "3":
-                    returnStatus = Debug.localhostInformation();
-                    break;
-                case "4":
-                    if(cmd.hasOption("p")){
-                        returnStatus = Debug.fileFragmentation(cmd.getOptionValue("p"));
-                    } else {
-                        throw new IllegalArgumentException("Invalid debug argument (discover mode needs a target file or directory path [-p])");
-                    }
-                    break;
-                default:
-                    throw new IllegalArgumentException("Invalid debug argument (debug option needs a valid value [1,2,3,4])");
-            }
+            returnStatus = Debug.debugInit(cmd, cmd.getOptionValue("d"), softwareVersion, inPort, outPort, networkInterface);
         }
 
         // TODO: other modes
@@ -77,9 +84,9 @@ public class BackupWave {
         Option debug = new Option("d", "debug", true, "debug mode for developers");
         Option target = new Option("t", "target", true, "specify the target address of an operation");
         Option path = new Option("p", "path", true, "specify a file or directory path of an operation");
-        Option remove = new Option("r", "remove", true, "remove a file or directory from stage");
-        Option add = new Option("a", "add", true, "add a new file or directory to stage");
-        Option backup = new Option("b", "backup", true, "backup a file or a directory");
+        Option remove = new Option("r", "remove", false, "remove a file or directory from stage");
+        Option add = new Option("a", "add", false, "add a new file or directory to stage");
+        Option backup = new Option("b", "backup", false, "backup a file or a directory");
 
         options.addOption(debug);
         options.addOption(target);

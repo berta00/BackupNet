@@ -24,15 +24,17 @@
 ###
 
 #### Arguments
-| short arg | long arg | option    | description                                        |
-|:----------|:---------|:----------|:---------------------------------------------------|
-| -d        | --debug  | 1         | debug mode 1 (opens port 4040 on the host)         |
-| -d        | --debug  | 2         | debug mode 2 [ -t ] (manual discovery mode)        |
-| -d        | --debug  | 3         | debug mode 3 (get local computer information)      |
-| -d        | --debug  | 4         | debug mode 4 (file fragmentation)                  |
-| -t        | --target | address   | specify the target address of an operation         |
-| -p        | --path   | file/path | specify a file or directory path of an operation   |
-| -r        | --remove | file/path | remove a file or directory from stage              |
-| -a        | --add    | file/path | add a new file or directory to stage               |
-| -b        | --backup | none      | backup all the files staged                        |
-| -b        | --backup | file/path | backup a file or a directory                       |
+| short arg | long arg   | option    | description                                      | needed |
+|:----------|:-----------|:----------|:-------------------------------------------------|:-------|
+| -d        | --debug    | 1         | debug mode 1 (opens port 4040 on the host)       | none   |
+| -d        | --debug    | 2         | debug mode 2 (manual discovery mode)             | [ -t ] |
+| -d        | --debug    | 3         | debug mode 3 (get local computer information)    | none   |
+| -d        | --debug    | 4         | debug mode 4 (file fragmentation)                | none   |
+| -a        | --add      | none      | add a new file or directory to stage             | [ -p ] |
+| -d        | --delete   | none      | delete a file or directory from stage            | [ -p ] |
+| -b        | --backup   | none      | backup all the files staged                      | none   |
+| -b        | --backup   | none      | backup a file or a directory                     | [ -p ] |
+| -r        | --recover  | none      | recover all the files staged                     | none   |
+| -r        | --recover  | none      | recover a file or a directory                    | [ -p ] |
+| -t        | --target   | address   | specify the target address of an operation       | none   |
+| -p        | --path     | file/path | specify a file or directory path of an operation | none   |

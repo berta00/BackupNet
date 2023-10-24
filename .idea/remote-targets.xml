@@ -5,12 +5,11 @@
       <target name="root@192.168.1.101:22" type="ssh/sftp" uuid="51af5530-90c6-4b04-a530-955560046e2c">
         <config>
           <option name="projectRootOnTarget" value="/root/BackupWave-software" />
-          <option name="serverName" value="root@192.168.1.101:22 password" />
-          <option name="useRsync" value="true" />
+          <option name="serverName" value="root@192.168.1.110:22 password" />
         </config>
         <ContributedStateBase type="JavaLanguageRuntime">
           <config>
-            <option name="homePath" value="/usr/java/jdk-17" />
+            <option name="homePath" value="/usr" />
             <option name="javaVersionString" value="17.0.8" />
           </config>
         </ContributedStateBase>
