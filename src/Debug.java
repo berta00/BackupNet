@@ -118,6 +118,7 @@ public class Debug {
         // fragment the file
         byte[][] fragmentedFile = FileUtilities.fragmentFile(parsedFile, frangmentsNumber);
 
+/*
         // print fragments
         for(int y = 0; y < fragmentedFile.length; y++){
             String fullFragment = "";
@@ -135,7 +136,7 @@ public class Debug {
         } catch (IOException e){
             System.out.println("Error: " + e.getMessage());
         }
-
+*/
         return 0;
     }
 }

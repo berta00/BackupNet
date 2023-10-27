@@ -13,7 +13,7 @@ public class FileUtilities {
     public static byte[][] fragmentFile(byte[] parsedFile, int fragmentNumber){
         // find the greatest comune divisor (will be the fragment number)
         int fragmentParityBytes = getFragmentParityBytes(parsedFile.length, fragmentNumber);
-        
+
         byte[][] fragmentedFile = new byte[fragmentNumber][(int) Math.ceil((double) parsedFile.length / fragmentNumber) + 1];
         for(int y = 0, x2 = 0; y < fragmentedFile.length; y++){
             for(int x = 0; x < fragmentedFile[y].length; x++){
