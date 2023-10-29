@@ -17,29 +17,26 @@ public class FileUtilities {
     public static FragmentedFileData fragmentFile(byte[] parsedFile, int fragmentNumber){
         // find the greatest comune divisor (will be the fragment number)
         int fragmentParityBytes = getFragmentParityBytes(parsedFile.length, fragmentNumber);
-        int fragmentLength = (int) Math.ceil((double) parsedFile.length / fragmentNumber);
+        int fragmentLength = (int) Math.ceil((double) parsedFile.length / fragmentNumber) + 1;
         int parsedFileChunkLength = (int) Math.floor((double) parsedFile.length / fragmentNumber);
 
-        byte[][] fragmentedFile = new byte[fragmentNumber][fragmentLength + 1];
-        byte[] currentFragment = new byte[fragmentLength + 1];
+        byte[][] fragmentedFile = new byte[fragmentNumber][fragmentLength];
+        byte[] currentFragment = new byte[fragmentLength];
         for(int y = 0, start = 0, end = parsedFileChunkLength; y < fragmentedFile.length; y++){
             // segment id
             currentFragment[0] = (byte) y;
             // segment body & parity byte
-            if(y <= fragmentParityBytes){
-                System.arraycopy(Arrays.copyOfRange(parsedFile, start, end), 0, currentFragment, 1, fragmentLength - 2);
-                end++;
+            if(y < fragmentParityBytes){
+                System.arraycopy(Arrays.copyOfRange(parsedFile, start, parsedFile.length), 0, currentFragment, 1, fragmentLength - 1);
+
+                start += parsedFileChunkLength + 1;
             } else {
-                System.arraycopy(Arrays.copyOfRange(parsedFile, start, end), 0, currentFragment, 1, fragmentLength - 3);
+                System.arraycopy(Arrays.copyOfRange(parsedFile, start, parsedFile.length), 0, currentFragment, 1, fragmentLength - 2);
+
+                start += parsedFileChunkLength;
             }
 
             fragmentedFile[y] = currentFragment.clone();
-
-            System.out.println("-------");
-            System.out.println(Arrays.toString(fragmentedFile[y]));
-
-            start = end + 1;
-            end += parsedFileChunkLength;
         }
 
         return new FragmentedFileData(fragmentedFile, fragmentParityBytes);

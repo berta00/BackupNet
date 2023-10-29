@@ -19,7 +19,7 @@ class DebugTest {
         FileInputStream file_1_1_2_in_str = new FileInputStream(new File("test/fragmentation/files/01-recovered.txt"));
 
         assertArrayEquals(file_1_1_in_str.readAllBytes(), file_1_1_2_in_str.readAllBytes());
-        System.out.println("execution time: " + (deltaTime * Math.pow(10, -9)) + "s");
+        System.out.println("execution time:     " + (deltaTime * Math.pow(10, -9)) + "s");
 
         // Dell-PowerEdge-R620-Spec-Sheet.pdf
         System.out.println("\n\n");
@@ -30,8 +30,8 @@ class DebugTest {
         FileInputStream file_2_2_in_str = new FileInputStream(new File("test/fragmentation/files/02-recovered.pdf"));
 
         assertArrayEquals(file_2_1_in_str.readAllBytes(), file_2_2_in_str.readAllBytes());
-        System.out.println("execution time: " + (deltaTime * Math.pow(10, -9)) + "s");
-/*
+        System.out.println("execution time:     " + (deltaTime * Math.pow(10, -9)) + "s");
+
         // ultraWide4.jpg
         System.out.println("\n\n");
         startTime = System.nanoTime();
@@ -41,7 +41,7 @@ class DebugTest {
         FileInputStream file_3_2_in_str = new FileInputStream(new File("test/fragmentation/files/05-recovered.jpg"));
 
         assertArrayEquals(file_3_1_in_str.readAllBytes(), file_3_2_in_str.readAllBytes());
-        System.out.println("execution time: " + (deltaTime * Math.pow(10, -9)) + "s");
+        System.out.println("execution time:     " + (deltaTime * Math.pow(10, -9)) + "s");
 
         // jwt-handbook-v0_14_1.pdf
         System.out.println("\n\n");
@@ -52,19 +52,19 @@ class DebugTest {
         FileInputStream file_4_2_in_str = new FileInputStream(new File("test/fragmentation/files/03-recovered.pdf"));
 
         assertArrayEquals(file_4_1_in_str.readAllBytes(), file_4_2_in_str.readAllBytes());
-        System.out.println("execution time: " + (deltaTime * Math.pow(10, -9)) + "s");
+        System.out.println("execution time:     " + (deltaTime * Math.pow(10, -9)) + "s");
 
-/*
-        // IMG_0070.MOV (too mutch)
+
+        // IMG_0070.MOV
         System.out.println("\n\n");
         startTime = System.nanoTime();
         Debug.fileFragmentation("test/fragmentation/files/04.MOV");
         deltaTime = System.nanoTime() - startTime;
-        FileInputStream file_3_1_in_str = new FileInputStream(new File("test/fragmentation/files/04.MOV"));
-        FileInputStream file_3_2_in_str = new FileInputStream(new File("test/fragmentation/files/04-recovered.MOV"));
+        FileInputStream file_5_1_in_str = new FileInputStream(new File("test/fragmentation/files/04.MOV"));
+        FileInputStream file_5_2_in_str = new FileInputStream(new File("test/fragmentation/files/04-recovered.MOV"));
 
-        assertArrayEquals(file_3_1_in_str.readAllBytes(), file_3_2_in_str.readAllBytes());
-        System.out.println("execution time: " + (deltaTime * Math.pow(10, -9)) + "s");
-*/
+        assertArrayEquals(file_5_1_in_str.readAllBytes(), file_5_2_in_str.readAllBytes());
+        System.out.println("execution time:     " + (deltaTime * Math.pow(10, -9)) + "s");
+
     }
 }
