@@ -1,6 +1,10 @@
 package utilities;
 
+import DataTypes.FragmentedFileData;
+
 import java.io.*;
+import java.lang.reflect.Array;
+import java.util.Arrays;
 
 public class FileUtilities {
 
@@ -10,47 +14,50 @@ public class FileUtilities {
     }
 
     // FILE FRAGMENTATION
-    public static byte[][] fragmentFile(byte[] parsedFile, int fragmentNumber){
+    public static FragmentedFileData fragmentFile(byte[] parsedFile, int fragmentNumber){
         // find the greatest comune divisor (will be the fragment number)
         int fragmentParityBytes = getFragmentParityBytes(parsedFile.length, fragmentNumber);
+        int fragmentLength = (int) Math.ceil((double) parsedFile.length / fragmentNumber);
+        int parsedFileChunkLength = (int) Math.floor((double) parsedFile.length / fragmentNumber);
 
-        byte[][] fragmentedFile = new byte[fragmentNumber][(int) Math.ceil((double) parsedFile.length / fragmentNumber) + 1];
-        for(int y = 0, x2 = 0; y < fragmentedFile.length; y++){
-            for(int x = 0; x < fragmentedFile[y].length; x++){
-                // first byte of the fragment contains the position tag
-                if(x == 0){
-                    fragmentedFile[y][x] = (byte) y;
-                } else if(x == 1 && fragmentParityBytes <= y){
-                    fragmentedFile[y][x] = 0; // null
-                } else {
-                    fragmentedFile[y][x] = parsedFile[x2];
-                    x2++;
-                }
+        byte[][] fragmentedFile = new byte[fragmentNumber][fragmentLength + 1];
+        byte[] currentFragment = new byte[fragmentLength + 1];
+        for(int y = 0, start = 0, end = parsedFileChunkLength; y < fragmentedFile.length; y++){
+            // segment id
+            currentFragment[0] = (byte) y;
+            // segment body & parity byte
+            if(y <= fragmentParityBytes){
+                System.arraycopy(Arrays.copyOfRange(parsedFile, start, end), 0, currentFragment, 1, fragmentLength - 2);
+                end++;
+            } else {
+                System.arraycopy(Arrays.copyOfRange(parsedFile, start, end), 0, currentFragment, 1, fragmentLength - 3);
             }
+
+            fragmentedFile[y] = currentFragment.clone();
+
+            System.out.println("-------");
+            System.out.println(Arrays.toString(fragmentedFile[y]));
+
+            start = end + 1;
+            end += parsedFileChunkLength;
         }
 
-        return fragmentedFile;
+        return new FragmentedFileData(fragmentedFile, fragmentParityBytes);
     }
 
     // FILE RECOVER
-    public static void recoverFile(byte[][] fragmentedFileBytes, String filePath) throws IOException {
-        int fileSize = 0;
-
-        for(int y = 0; y < fragmentedFileBytes.length; y++){
-            for(int x = 0; x < fragmentedFileBytes[y].length; x++){
-                if(!(fragmentedFileBytes[y][x] == 0 && x == 1) && x != 0){
-                    fileSize++;
-                }
-            }
-        }
+    public static void recoverFile(FragmentedFileData fragmentedFileBytes, String filePath) throws IOException {
+        int fileSize = fragmentedFileBytes.getFileFragments().length * (fragmentedFileBytes.getFileFragments()[0].length - 2) + fragmentedFileBytes.getParityBytes();
+        int parsedFileChunkLength = (int) Math.ceil((double) fileSize / fragmentedFileBytes.getFileFragments().length) + 1;
 
         byte[] fileBytes = new byte[fileSize];
-        for(int y = 0, x2 = 0; y < fragmentedFileBytes.length; y++){
-            for(int x = 0; x < fragmentedFileBytes[y].length; x++){
-                if(!(fragmentedFileBytes[y][x] == 0 && x == 1) && x != 0){
-                    fileBytes[x2] = fragmentedFileBytes[y][x];
-                    x2++;
-                }
+        for(int y = 0, start = 0; y < fragmentedFileBytes.getFileFragments().length; y++){
+            if(y < fragmentedFileBytes.getParityBytes()){
+                System.arraycopy(fragmentedFileBytes.getFileFragments()[y], 1, fileBytes, start, parsedFileChunkLength - 1);
+                start += parsedFileChunkLength - 1;
+            } else {
+                System.arraycopy(fragmentedFileBytes.getFileFragments()[y], 1, fileBytes, start, parsedFileChunkLength - 2);
+                start += parsedFileChunkLength - 2;
             }
         }
 

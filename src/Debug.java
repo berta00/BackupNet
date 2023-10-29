@@ -1,3 +1,4 @@
+import DataTypes.FragmentedFileData;
 import utilities.FileUtilities;
 import utilities.IpUtilities;
 import utilities.PathUtilities;
@@ -116,16 +117,7 @@ public class Debug {
         }
 
         // fragment the file
-        byte[][] fragmentedFile = FileUtilities.fragmentFile(parsedFile, frangmentsNumber);
-
-/*
-        // print fragments
-        for(int y = 0; y < fragmentedFile.length; y++){
-            String fullFragment = "";
-            for(int x = 0; x < fragmentedFile[y].length; x++){
-                fullFragment += Integer.toHexString(fragmentedFile[y][x]);
-            }
-        }
+        FragmentedFileData fragmentedFile = FileUtilities.fragmentFile(parsedFile, frangmentsNumber);
 
         // recover the file (to demonstrate the fragmentation relaiability)
         try {
@@ -136,7 +128,7 @@ public class Debug {
         } catch (IOException e){
             System.out.println("Error: " + e.getMessage());
         }
-*/
+
         return 0;
     }
 }
