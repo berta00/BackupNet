@@ -1,12 +1,11 @@
-import DataTypes.FragmentedFileData;
-import utilities.FileUtilities;
-import utilities.IpUtilities;
-import utilities.PathUtilities;
-import org.apache.commons.cli.*;
+import DataTypes.*;
+import utilities.*;
 
-import java.io.IOException;
+import java.io.File;
 import java.net.*;
 import java.util.List;
+
+import org.apache.commons.cli.*;
 
 public class Debug {
 
@@ -32,11 +31,18 @@ public class Debug {
                 if(cmd.hasOption("p")){
                     returnStatus = Debug.fileFragmentation(cmd.getOptionValue("p"));
                 } else {
-                    throw new IllegalArgumentException("Invalid debug argument (discover mode needs a target file or directory path [-p])");
+                    throw new IllegalArgumentException("Invalid debug argument (file fragmentation debug mode require a file path [-p])");
+                }
+                break;
+            case "5":
+                if(cmd.hasOption("p")){
+                    returnStatus = Debug.directoryFragmentation(cmd.getOptionValue("p"));
+                } else {
+                    throw new IllegalArgumentException("Invalid debug argument (file fragmentation debug mode require a directory path [-p])");
                 }
                 break;
             default:
-                throw new IllegalArgumentException("Invalid debug argument (debug option needs a valid value [1,2,3,4])");
+                throw new IllegalArgumentException("Invalid debug argument (debug option needs a valid value [1,2,3,4,5])");
         }
 
         return returnStatus;
@@ -107,25 +113,42 @@ public class Debug {
         int frangmentsNumber = 9;
         System.out.println("fragments number:   " + frangmentsNumber);
         System.out.println("file path:          " + filePath);
+        System.out.println();
 
-        // parse the file
-        byte[] parsedFile = null;
+        // parse and fragment the file
+        FragmentedFileData fragmentedFile = null;
         try {
-            parsedFile = FileUtilities.parseFile(System.getProperty("user.dir") + "/" + filePath);
+            fragmentedFile = FileUtilities.parseAndFragmentFile(new File(System.getProperty("user.dir") + "/" + filePath), frangmentsNumber, true);
         } catch(Exception e){
             System.out.println("Error: " + e.getMessage());
         }
 
-        // fragment the file
-        FragmentedFileData fragmentedFile = FileUtilities.fragmentFile(parsedFile, frangmentsNumber);
-
-        // recover the file (to demonstrate the fragmentation relaiability)
+        // recover the file (only debug purpose)
         try {
-            // reconstrict the file-path
-            String recoverFilePath = PathUtilities.reconstructFilePathWithTag(filePath, "recovered");
-            // actual recover
-            FileUtilities.recoverFile(fragmentedFile, recoverFilePath);
-        } catch (IOException e){
+            FileUtilities.recoverFile(fragmentedFile, filePath, PathUtilities.reconstructFilePathWithTag(filePath, "recovered"), true);
+        } catch (Exception e){
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        return 0;
+    }
+    public static int directoryFragmentation(String directoryPath){
+        System.out.println("Debug mode 5 - directory fragmentation test \n");
+
+        int fragmentNumber = 6;
+
+        // parse and fragment the file
+        FileStructure<File> parsedDirectory = null;
+        try {
+            parsedDirectory = DirectoryUtilities.parseAndFragmentDirectory(new File(directoryPath), fragmentNumber, true);
+        } catch(Exception e){
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        // recover the file (only debug purpose)
+        try {
+            DirectoryUtilities.recoverDirectory(parsedDirectory, directoryPath, PathUtilities.reconstructDirectoryPathWithTag(directoryPath, "recovered"), true);
+        } catch (Exception e){
             System.out.println("Error: " + e.getMessage());
         }
 

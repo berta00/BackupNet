@@ -7,6 +7,7 @@
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/test/fragmentation" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/test/fragmentation/files" type="java-test-resource" />
+      <excludeFolder url="file://$MODULE_DIR$/test/fragmentation/files/subFiles3/cisco1/cisco1" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -38,5 +39,6 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="library" name="progressbar-1.4.17.1" level="project" />
   </component>
 </module>

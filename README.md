@@ -29,7 +29,8 @@
 | -d        | --debug    | 1         | debug mode 1 (opens port 4040 on the host)       | none   |
 | -d        | --debug    | 2         | debug mode 2 (manual discovery mode)             | [ -t ] |
 | -d        | --debug    | 3         | debug mode 3 (get local computer information)    | none   |
-| -d        | --debug    | 4         | debug mode 4 (file fragmentation)                | none   |
+| -d        | --debug    | 4         | debug mode 4 (file fragmentation)                | [ -p ] |
+| -d        | --debug    | 5         | debug mode 5 (directory fragmentation)           | [ -p ] |
 | -a        | --add      | none      | add a new file or directory to stage             | [ -p ] |
 | -d        | --delete   | none      | delete a file or directory from stage            | [ -p ] |
 | -b        | --backup   | none      | backup all the files staged                      | none   |

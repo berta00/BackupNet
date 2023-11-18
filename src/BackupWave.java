@@ -1,8 +1,9 @@
 import configuration.Configuration;
-import org.apache.commons.cli.*;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+
+import org.apache.commons.cli.*;
 
 public class BackupWave {
     // RELEASE INFORMATION

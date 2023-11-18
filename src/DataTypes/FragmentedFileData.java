@@ -5,7 +5,7 @@ public class FragmentedFileData {
     int parityBytes;
 
     public FragmentedFileData(byte[][]fileFragments, int parityBytes){
-        this.fileFragments = fileFragments;
+        this.fileFragments = fileFragments.clone();
         this.parityBytes = parityBytes;
     }
     public byte[][] getFileFragments(){
