@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/BackupWave-software.iml" filepath="$PROJECT_DIR$/BackupWave-software.iml" />
+      <module fileurl="file://$PROJECT_DIR$/BackupNet.iml" filepath="$PROJECT_DIR$/BackupNet.iml" />
     </modules>
   </component>
 </project>
